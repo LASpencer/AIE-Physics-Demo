@@ -55,7 +55,7 @@ public class PlayerController : MonoBehaviour {
         {
             if (m_movingCharacter.Jump())
             {
-                //m_animator.SetTrigger("Jumped");
+                m_animator.SetTrigger("Jumped");
             }
         }
         m_jump = false;
