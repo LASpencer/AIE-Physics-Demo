@@ -6,8 +6,8 @@ using UnityEngine;
 [RequireComponent(typeof(CapsuleCollider))]
 public class MovingCharacter : MonoBehaviour {
 
-    const float GROUND_CHECK_OFFSET = 0.1f;
-    const float GROUND_CHECK_DISTANCE = 0.3f;
+    const float GROUND_CHECK_OFFSET = 0.3f;
+    const float GROUND_CHECK_DISTANCE = 0.4f;
 
     Rigidbody m_rigidbody;
 
@@ -30,6 +30,8 @@ public class MovingCharacter : MonoBehaviour {
     public bool IsGrounded { get { return m_grounded; } }
 
     public float RotationSpeed;
+
+    public float JumpForce;
 
 	void Awake() {
 	}
@@ -61,6 +63,7 @@ public class MovingCharacter : MonoBehaviour {
     private void FixedUpdate()
     {
         checkGround();
+        Debug.Log("Velocity: " + m_rigidbody.velocity.ToString());
     }
 
     /// <summary>
@@ -114,6 +117,26 @@ public class MovingCharacter : MonoBehaviour {
     }
 
     // TODO jump command
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns>Returns true if character could jump</returns>
+    public bool Jump()
+    {
+        if (m_grounded)
+        {
+            // HACK try both adding and setting Y
+            Vector3 jumpVelocity = m_rigidbody.velocity;
+            jumpVelocity.y = JumpForce;
+            m_rigidbody.velocity = jumpVelocity;
+            m_grounded = false;
+            m_groundNormal = Vector3.up;
+            return true;
+        } else
+        {
+            return false;
+        }
+    }
 
     // TODO crouch/uncrouch function
     // Uncrouch needs to check nothing too high above

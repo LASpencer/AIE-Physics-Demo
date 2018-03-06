@@ -12,6 +12,7 @@ public class PlayerController : MonoBehaviour {
     public float Speed;
 
     Vector3 m_movementInput;
+    bool m_jump;
 
 	// Use this for initialization
 	void Start () {
@@ -20,13 +21,43 @@ public class PlayerController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+        
+
         m_movementInput = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical")).normalized;
         m_movementInput *= Speed;
 
         // HACK maybe move out to fixed update
+        //m_movingCharacter.SetGroundVelocity(m_movementInput);
+
+        // HACK get actual speed, not desired
+        //m_animator.SetFloat("Speed", m_movementInput.magnitude);
+
+        if (Input.GetButtonDown("Jump"))
+        {
+            m_jump = true;
+            //if (m_movingCharacter.Jump())
+            //{
+            //    m_animator.SetTrigger("Jumped");
+            //}
+        }
+    }
+
+    private void FixedUpdate()
+    {
+        m_animator.SetBool("Grounded", m_movingCharacter.IsGrounded);
+
         m_movingCharacter.SetGroundVelocity(m_movementInput);
 
         // HACK get actual speed, not desired
         m_animator.SetFloat("Speed", m_movementInput.magnitude);
+
+        if (m_jump)
+        {
+            if (m_movingCharacter.Jump())
+            {
+                //m_animator.SetTrigger("Jumped");
+            }
+        }
+        m_jump = false;
     }
 }
