@@ -7,6 +7,8 @@ public class PlayerController : MonoBehaviour {
 
     MovingCharacter m_movingCharacter;
 
+    public Animator m_animator;
+
     public float Speed;
 
     Vector3 m_movementInput;
@@ -23,5 +25,8 @@ public class PlayerController : MonoBehaviour {
 
         // HACK maybe move out to fixed update
         m_movingCharacter.SetGroundVelocity(m_movementInput);
+
+        // HACK get actual speed, not desired
+        m_animator.SetFloat("Speed", m_movementInput.magnitude);
     }
 }
