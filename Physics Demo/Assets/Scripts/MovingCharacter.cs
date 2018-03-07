@@ -10,6 +10,7 @@ public class MovingCharacter : MonoBehaviour {
     const float GROUND_CHECK_DISTANCE = 0.4f;
 
     Rigidbody m_rigidbody;
+    new public Rigidbody rigidbody { get { return m_rigidbody; } }
 
     [SerializeField]
     CapsuleCollider m_collider;
@@ -20,6 +21,16 @@ public class MovingCharacter : MonoBehaviour {
     bool m_crouched;
     public bool Crouched { get { return m_crouched; } }
 
+    [Header("Movement")]
+    public float GroundForce;
+    public float AirForce;
+    public float BrakingForce;
+
+    public float JumpVelocity;
+    public float RotationSpeed;
+
+
+    [Header("Crouching")]
     [SerializeField]
     float m_crouchCapsuleRadius;
     [SerializeField]
@@ -30,10 +41,6 @@ public class MovingCharacter : MonoBehaviour {
     Vector3 m_groundNormal;
     bool m_grounded;
     public bool IsGrounded { get { return m_grounded; } }
-
-    public float RotationSpeed;
-
-    public float JumpForce;
 
 	void Awake() {
 	}
@@ -67,7 +74,6 @@ public class MovingCharacter : MonoBehaviour {
     private void FixedUpdate()
     {
         checkGround();
-        Debug.Log("Velocity: " + m_rigidbody.velocity.ToString());
     }
 
     /// <summary>
@@ -78,24 +84,41 @@ public class MovingCharacter : MonoBehaviour {
     {
         // TODO if ground normal not too steep (count as (0,1,0) in air), project move onto ground and set velocity to move along it
         Vector3 groundVelocity = Vector3.ProjectOnPlane(velocity, m_groundNormal);
-        // TODO turn rigidbody towards desired direction
 
-        RotateTowards(groundVelocity);
+        Vector3 difference = groundVelocity - m_rigidbody.velocity;
 
-        // Maybe if facing and desired velocity too far apart, move less while turning?
-
-        //TODO maybe air control can be set at different levels from 0 (momentum only) to 1(treat like ground movement)
-
-        // Move along desired velocity
+        float acceleration;
         if (m_grounded)
         {
-            m_rigidbody.velocity = groundVelocity;
+            float frictionRatio = 0.0f;  // How much braking force to apply
+            if(groundVelocity == Vector3.zero)
+            {
+                // Coming to a stop
+                frictionRatio = 1.0f;
+            } else if (m_rigidbody.velocity != Vector3.zero)
+            {
+                // Braking based by how far off actual velocity
+                float cosAngle = Vector3.Dot(m_rigidbody.velocity.normalized, groundVelocity.normalized);
+                frictionRatio = 0.5f - 0.5f * cosAngle;
+            }
+            acceleration = GroundForce + frictionRatio * BrakingForce;
         } else
         {
-            // If not grounded, keep vertical component of velocity
-            groundVelocity.y = m_rigidbody.velocity.y;
-            m_rigidbody.velocity = groundVelocity;
+            acceleration = AirForce;
         }
+
+        Vector3 deltaV = Vector3.ClampMagnitude(difference, acceleration * Time.fixedDeltaTime);
+
+        m_rigidbody.AddForce(deltaV, ForceMode.VelocityChange);
+
+        // TODO turn rigidbody towards desired direction
+
+        RotateTowards(m_rigidbody.velocity);
+
+        // Maybe if facing and desired velocity too far apart, move less while turning?
+        
+        
+
     }
 
     public void SetVelocity(Vector3 velocity)
@@ -130,7 +153,7 @@ public class MovingCharacter : MonoBehaviour {
         if (m_grounded)
         {
             // HACK try both adding and setting Y
-            m_rigidbody.velocity = new Vector3(m_rigidbody.velocity.x, JumpForce, m_rigidbody.velocity.z);
+            m_rigidbody.velocity = new Vector3(m_rigidbody.velocity.x, JumpVelocity, m_rigidbody.velocity.z);
             m_grounded = false;
             m_groundNormal = Vector3.up;
             return true;
@@ -191,5 +214,19 @@ public class MovingCharacter : MonoBehaviour {
         }
 
         //TODO more robust check (multiple rays, boxcast)
+    }
+
+    [ExecuteInEditMode]
+    private void OnValidate()
+    {
+        GroundForce = Mathf.Abs(GroundForce);
+        AirForce = Mathf.Abs(AirForce);
+        BrakingForce = Mathf.Abs(BrakingForce);
+
+        JumpVelocity = Mathf.Abs(JumpVelocity);
+        RotationSpeed = Mathf.Abs(RotationSpeed);
+
+        m_crouchCapsuleRadius = Mathf.Abs(m_crouchCapsuleRadius);
+        m_crouchCapsuleHeight = Mathf.Abs(m_crouchCapsuleHeight);
     }
 }

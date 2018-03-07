@@ -56,7 +56,7 @@ public class PlayerController : MonoBehaviour {
         m_movingCharacter.SetGroundVelocity(m_movementInput);
 
         // HACK get actual speed, not desired
-        m_animator.SetFloat("Speed", m_movementInput.magnitude);
+        m_animator.SetFloat("Speed", m_movingCharacter.rigidbody.velocity.magnitude);
 
         if (m_jump)
         {
