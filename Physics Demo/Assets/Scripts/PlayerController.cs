@@ -10,7 +10,7 @@ public class PlayerController : MonoBehaviour {
     public Animator m_animator;
 
     public float Speed;
-
+    //TODO crouching move speed
     Vector3 m_movementInput;
     bool m_jump;
 
@@ -39,6 +39,13 @@ public class PlayerController : MonoBehaviour {
             //{
             //    m_animator.SetTrigger("Jumped");
             //}
+        }
+
+        if (Input.GetButtonDown("Fire1"))
+        {
+            m_movingCharacter.SetCrouching(!m_movingCharacter.Crouched);
+            m_animator.SetBool("Crouching", m_movingCharacter.Crouched);
+            // TODO can't crouch in jump, on ungrounding, uncrouch
         }
     }
 

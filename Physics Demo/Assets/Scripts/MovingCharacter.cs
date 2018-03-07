@@ -17,6 +17,9 @@ public class MovingCharacter : MonoBehaviour {
     float m_capsuleRadius, m_capsuleHeight;
     Vector3 m_capsuleCenter;
 
+    bool m_crouched;
+    public bool Crouched { get { return m_crouched; } }
+
     [SerializeField]
     float m_crouchCapsuleRadius;
     [SerializeField]
@@ -26,7 +29,6 @@ public class MovingCharacter : MonoBehaviour {
 
     Vector3 m_groundNormal;
     bool m_grounded;
-
     public bool IsGrounded { get { return m_grounded; } }
 
     public float RotationSpeed;
@@ -51,7 +53,9 @@ public class MovingCharacter : MonoBehaviour {
         m_rigidbody = gameObject.GetComponent<Rigidbody>();
         m_rigidbody.constraints = RigidbodyConstraints.FreezeRotation;
 
+        m_crouched = false;
 
+        m_grounded = true;
         checkGround();
 	}
 	
@@ -126,9 +130,7 @@ public class MovingCharacter : MonoBehaviour {
         if (m_grounded)
         {
             // HACK try both adding and setting Y
-            Vector3 jumpVelocity = m_rigidbody.velocity;
-            jumpVelocity.y = JumpForce;
-            m_rigidbody.velocity = jumpVelocity;
+            m_rigidbody.velocity = new Vector3(m_rigidbody.velocity.x, JumpForce, m_rigidbody.velocity.z);
             m_grounded = false;
             m_groundNormal = Vector3.up;
             return true;
@@ -140,19 +142,50 @@ public class MovingCharacter : MonoBehaviour {
 
     // TODO crouch/uncrouch function
     // Uncrouch needs to check nothing too high above
-
+    public bool SetCrouching(bool crouch)
+    {
+        if(crouch == m_crouched)
+        {
+            return true;
+        } else if (crouch)
+        {
+            // Crouching
+            m_crouched = true;
+            m_collider.height = m_crouchCapsuleHeight;
+            m_collider.radius = m_crouchCapsuleRadius;
+            m_collider.center = m_crouchCapsuleCenter;
+            return true;
+        } else
+        {
+            // TODO on uncrouching, check enough headroom. If not, stay crouched and return false
+            m_crouched = false;
+            m_collider.height = m_capsuleHeight;
+            m_collider.radius = m_capsuleRadius;
+            m_collider.center = m_capsuleCenter;
+            return true;
+        }
+    }
     
     void checkGround()
     {
-        // checkGround to get grounded and ground normal
-        RaycastHit groundTest;
-        // TODO figure out layermask, whether querytriggerinteraction needs setting
-        m_grounded = Physics.Raycast(transform.position + Vector3.up * GROUND_CHECK_OFFSET, Vector3.down, out groundTest, GROUND_CHECK_DISTANCE);
-        Debug.DrawRay(transform.position + Vector3.up * GROUND_CHECK_OFFSET, Vector3.down, Color.red);
-        if (m_grounded)
+        if (m_grounded || m_rigidbody.velocity.y <= 0)      // If not grounded and moving up, won't ground
         {
-            m_groundNormal = groundTest.normal;
-        } else
+            // checkGround to get grounded and ground normal
+            RaycastHit groundTest;
+            // TODO figure out layermask, whether querytriggerinteraction needs setting
+            m_grounded = Physics.Raycast(transform.position + Vector3.up * GROUND_CHECK_OFFSET, Vector3.down, out groundTest, GROUND_CHECK_DISTANCE);
+            Debug.DrawRay(transform.position + Vector3.up * GROUND_CHECK_OFFSET, Vector3.down, Color.red);
+            Vector3 hitNormal = groundTest.normal;
+            if (m_grounded)
+            {
+                m_groundNormal = groundTest.normal;
+            }
+            else
+            {
+                m_groundNormal = Vector3.up;
+            }
+        }
+        else
         {
             m_groundNormal = Vector3.up;
         }
