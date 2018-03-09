@@ -9,6 +9,8 @@ public class PlayerController : MonoBehaviour {
 
     public Animator m_animator;
 
+    public CameraController cam;
+
     public float Speed;
     //TODO crouching move speed
     Vector3 m_movementInput;
@@ -17,13 +19,18 @@ public class PlayerController : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         m_movingCharacter = gameObject.GetComponent<MovingCharacter>();
+        cam.Player = this;
 	}
 	
 	// Update is called once per frame
 	void Update () {
-        
 
-        m_movementInput = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical")).normalized;
+        // Get forward and right direction on x-z plane relative to camera
+        Vector3 cameraForward = Vector3.ProjectOnPlane(cam.transform.forward, Vector3.up);
+        Vector3 cameraRight = new Vector3(cameraForward.z, 0, -cameraForward.x);
+        Vector3.OrthoNormalize(ref cameraForward, ref cameraRight);
+
+        m_movementInput = cameraForward * Input.GetAxis("Vertical") + cameraRight * Input.GetAxis("Horizontal");
         m_movementInput *= Speed;
 
         // HACK maybe move out to fixed update
