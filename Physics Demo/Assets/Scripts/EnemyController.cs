@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class EnemyController : MonoBehaviour {
 
-    RagdollManager ragdoll;
+    public RagdollManager ragdoll;
 
 	// Use this for initialization
 	void Start () {

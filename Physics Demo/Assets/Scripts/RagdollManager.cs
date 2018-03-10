@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class RagdollManager : MonoBehaviour {
 
-    GameObject Root;
-    List<Rigidbody> RagdollBodies;
+    public GameObject Root;
+    public List<Rigidbody> RagdollBodies;
 
     private void Awake()
     {
