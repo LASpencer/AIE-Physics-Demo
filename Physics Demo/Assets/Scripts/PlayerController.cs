@@ -48,7 +48,7 @@ public class PlayerController : MonoBehaviour {
             //}
         }
 
-        if (Input.GetButtonDown("Fire1"))
+        if (Input.GetButtonDown("Crouch"))
         {
             m_movingCharacter.SetCrouching(!m_movingCharacter.Crouched);
             m_animator.SetBool("Crouching", m_movingCharacter.Crouched);
