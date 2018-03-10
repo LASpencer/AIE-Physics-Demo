@@ -6,6 +6,8 @@ using UnityEngine;
 [RequireComponent(typeof(CapsuleCollider))]
 public class MovingCharacter : MonoBehaviour {
 
+    const float MIN_GROUND_SPEED = 0.1f;
+    const int FRAMES_UNTIL_FREEZE = 5;
     const float GROUND_CHECK_OFFSET = 0.3f;
     const float GROUND_CHECK_DISTANCE = 0.4f;
 
@@ -42,6 +44,8 @@ public class MovingCharacter : MonoBehaviour {
     bool m_grounded;
     public bool IsGrounded { get { return m_grounded; } }
 
+    int framesStationary = 0;
+
 	void Awake() {
 	}
 
@@ -59,6 +63,7 @@ public class MovingCharacter : MonoBehaviour {
 
         m_rigidbody = gameObject.GetComponent<Rigidbody>();
         m_rigidbody.constraints = RigidbodyConstraints.FreezeRotation;
+        framesStationary = 0;
 
         m_crouched = false;
 
@@ -92,21 +97,46 @@ public class MovingCharacter : MonoBehaviour {
         if (m_grounded)
         {
             float frictionRatio = 0.0f;  // How much braking force to apply
-            if(groundVelocity == Vector3.zero)
+            if (groundVelocity == Vector3.zero)
             {
                 // Coming to a stop
                 frictionRatio = 1.0f;
                 stopping = true;
-            } else if (m_rigidbody.velocity != Vector3.zero)
+                // Force stop if moving slowly
+                if (m_rigidbody.velocity.sqrMagnitude < MIN_GROUND_SPEED * MIN_GROUND_SPEED)
+                {
+                    if (framesStationary >= FRAMES_UNTIL_FREEZE)
+                    {
+                        m_rigidbody.constraints = RigidbodyConstraints.FreezeAll;
+                        m_rigidbody.velocity = Vector3.zero;
+                        difference = Vector3.zero;
+                    }
+                    else
+                    {
+                        framesStationary++;
+                    }
+                }
+                else
+                {
+                    UnfreezeMovement();
+                }
+
+            }
+            else
             {
-                // Braking based by how far off actual velocity
-                float cosAngle = Vector3.Dot(m_rigidbody.velocity.normalized, groundVelocity.normalized);
-                frictionRatio = 0.5f - 0.5f * cosAngle;
+                UnfreezeMovement();
+                if (m_rigidbody.velocity != Vector3.zero)
+                {
+                    // Braking based by how far off actual velocity
+                    float cosAngle = Vector3.Dot(m_rigidbody.velocity.normalized, groundVelocity.normalized);
+                    frictionRatio = 0.5f - 0.5f * cosAngle;
+                }
             }
             acceleration = GroundForce + frictionRatio * BrakingForce;
         } else
         {
             acceleration = AirForce;
+            UnfreezeMovement();
         }
 
         Vector3 deltaV = Vector3.ClampMagnitude(difference, acceleration * Time.fixedDeltaTime);
@@ -156,6 +186,7 @@ public class MovingCharacter : MonoBehaviour {
         if (m_grounded)
         {
             // HACK try both adding and setting Y
+            UnfreezeMovement();
             m_rigidbody.velocity = new Vector3(m_rigidbody.velocity.x, JumpVelocity, m_rigidbody.velocity.z);
             m_grounded = false;
             m_groundNormal = Vector3.up;
@@ -176,6 +207,7 @@ public class MovingCharacter : MonoBehaviour {
         } else if (crouch)
         {
             // Crouching
+            UnfreezeMovement();
             m_crouched = true;
             m_collider.height = m_crouchCapsuleHeight;
             m_collider.radius = m_crouchCapsuleRadius;
@@ -185,6 +217,7 @@ public class MovingCharacter : MonoBehaviour {
         {
             // TODO on uncrouching, check enough headroom. If not, stay crouched and return false
             // Use a spherecast matching the standing capsule to check going to stand won't collide
+            UnfreezeMovement();
             m_crouched = false;
             m_collider.height = m_capsuleHeight;
             m_collider.radius = m_capsuleRadius;
@@ -232,5 +265,11 @@ public class MovingCharacter : MonoBehaviour {
 
         m_crouchCapsuleRadius = Mathf.Abs(m_crouchCapsuleRadius);
         m_crouchCapsuleHeight = Mathf.Abs(m_crouchCapsuleHeight);
+    }
+
+    private void UnfreezeMovement()
+    {
+        m_rigidbody.constraints = RigidbodyConstraints.FreezeRotation;
+        framesStationary = 0;
     }
 }
