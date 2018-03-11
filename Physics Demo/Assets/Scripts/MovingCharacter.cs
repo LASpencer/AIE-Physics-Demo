@@ -272,4 +272,5 @@ public class MovingCharacter : MonoBehaviour {
         m_rigidbody.constraints = RigidbodyConstraints.FreezeRotation;
         framesStationary = 0;
     }
+
 }

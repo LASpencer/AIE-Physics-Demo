@@ -54,6 +54,23 @@ public class PlayerController : MonoBehaviour {
             m_animator.SetBool("Crouching", m_movingCharacter.Crouched);
             // TODO can't crouch in jump, on ungrounding, uncrouch
         }
+
+        if (Input.GetButtonDown("Fire1"))
+        {
+            Ray clickRay = Camera.main.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
+            // TODO figure out layers, mask
+            if(Physics.Raycast(clickRay, out hit))
+            {
+                //TODO use tags, etc to make decision
+                EnemyController enemy = hit.collider.GetComponent<EnemyController>();
+                if(enemy != null)
+                {
+                    // TODO check in firing range, just do damage instead of killing
+                    enemy.kill();
+                }
+            }
+        }
     }
 
     private void FixedUpdate()

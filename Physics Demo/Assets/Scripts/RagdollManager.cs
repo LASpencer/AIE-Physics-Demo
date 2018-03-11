@@ -27,6 +27,11 @@ public class RagdollManager : MonoBehaviour {
         {
             body.isKinematic = !value;
             // HACK maybe also turn colliders on and off?
+            Collider c = body.GetComponent<Collider>();
+            if (c != null)
+            {
+                c.enabled = value;
+            }
         }
     }
 }
