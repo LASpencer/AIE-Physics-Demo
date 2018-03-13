@@ -2477,6 +2477,9 @@ MonoBehaviour:
   m_movingCharacter: {fileID: 114340266387379730}
   Health: 2
   Alive: 0
+  HitParticles: {fileID: 1255605533545046, guid: a45d3b92ad9881746b3d4418ff3de831,
+    type: 2}
+  HitParticleTime: 5
 --- !u!135 &135249966495831852
 SphereCollider:
   m_ObjectHideFlags: 1
