@@ -84,6 +84,7 @@ public class MovingCharacter : MonoBehaviour {
     {
         // TODO if ground normal not too steep (count as (0,1,0) in air), project move onto ground and set velocity to move along it
         Vector3 groundVelocity = Vector3.ProjectOnPlane(velocity, m_groundNormal);
+        bool stopping = false;
 
         Vector3 difference = groundVelocity - m_rigidbody.velocity;
 
@@ -95,6 +96,7 @@ public class MovingCharacter : MonoBehaviour {
             {
                 // Coming to a stop
                 frictionRatio = 1.0f;
+                stopping = true;
             } else if (m_rigidbody.velocity != Vector3.zero)
             {
                 // Braking based by how far off actual velocity
@@ -113,11 +115,12 @@ public class MovingCharacter : MonoBehaviour {
 
         // TODO turn rigidbody towards desired direction
 
-        RotateTowards(m_rigidbody.velocity);
-
+        if (!stopping) {
+            RotateTowards(m_rigidbody.velocity);
+        }
         // Maybe if facing and desired velocity too far apart, move less while turning?
-        
-        
+
+
 
     }
 
@@ -181,6 +184,7 @@ public class MovingCharacter : MonoBehaviour {
         } else
         {
             // TODO on uncrouching, check enough headroom. If not, stay crouched and return false
+            // Use a spherecast matching the standing capsule to check going to stand won't collide
             m_crouched = false;
             m_collider.height = m_capsuleHeight;
             m_collider.radius = m_capsuleRadius;
