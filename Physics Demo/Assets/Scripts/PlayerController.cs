@@ -19,6 +19,10 @@ public class PlayerController : MonoBehaviour {
     [Header("Combat")]
     [SerializeField]
     LayerMask ShootMask;
+    [SerializeField]
+    Transform ShotOrigin;
+    public GameObject ShotLine;
+    public float LaserEffectTime;
     public int Damage;
     public int HeadshotDamage;
     public float ShotRange;
@@ -67,9 +71,19 @@ public class PlayerController : MonoBehaviour {
         {
             Ray clickRay = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
+
             // TODO figure out layers, mask
             if(Physics.Raycast(clickRay, out hit, float.PositiveInfinity, ShootMask, QueryTriggerInteraction.Collide))
             {
+                // TODO second raycast from head to clicked position to check laser can hit
+
+                // draw beam being shot
+                GameObject laser = Instantiate(ShotLine);
+                LineRenderer laserLine = laser.GetComponent<LineRenderer>();
+                laserLine.SetPosition(0, ShotOrigin.position);
+                laserLine.SetPosition(1, hit.point);
+                Destroy(laser, LaserEffectTime);
+
                 //TODO use tags, etc to make decision
                 RagdollJoint dollJoint = hit.collider.GetComponent<RagdollJoint>();
                 EnemyController enemy = hit.collider.GetComponentInParent<EnemyController>();
@@ -85,8 +99,8 @@ public class PlayerController : MonoBehaviour {
                         Debug.Log("Shot enemy");
                     }
                     // TODO check is 
-                    Vector3 direction = hit.point - transform.position;
-                    // TODO draw beam being shot
+                    Vector3 direction = hit.point - ShotOrigin.position;
+                    
                     enemy.Shoot(dollJoint, shotDamage, direction.normalized * ShotForce, hit.point);
                 }
             }
