@@ -16,6 +16,14 @@ public class PlayerController : MonoBehaviour {
     Vector3 m_movementInput;
     bool m_jump;
 
+    [Header("Combat")]
+    [SerializeField]
+    LayerMask ShootMask;
+    public int Damage;
+    public int HeadshotDamage;
+    public float ShotRange;
+    public float ShotForce;
+
 	// Use this for initialization
 	void Start () {
         m_movingCharacter = gameObject.GetComponent<MovingCharacter>();
@@ -60,14 +68,26 @@ public class PlayerController : MonoBehaviour {
             Ray clickRay = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
             // TODO figure out layers, mask
-            if(Physics.Raycast(clickRay, out hit))
+            if(Physics.Raycast(clickRay, out hit, float.PositiveInfinity, ShootMask, QueryTriggerInteraction.Collide))
             {
                 //TODO use tags, etc to make decision
-                EnemyController enemy = hit.collider.GetComponent<EnemyController>();
-                if(enemy != null)
+                RagdollJoint dollJoint = hit.collider.GetComponent<RagdollJoint>();
+                EnemyController enemy = hit.collider.GetComponentInParent<EnemyController>();
+                if(enemy != null && dollJoint != null)
                 {
-                    // TODO check in firing range, just do damage instead of killing
-                    enemy.kill();
+                    int shotDamage = Damage;
+                    if(dollJoint.Part == RagdollPart.Head)
+                    {
+                        shotDamage = HeadshotDamage;
+                        Debug.Log("Headshot on enemy");
+                    } else
+                    {
+                        Debug.Log("Shot enemy");
+                    }
+                    // TODO check is 
+                    Vector3 direction = hit.point - transform.position;
+                    // TODO draw beam being shot
+                    enemy.Shoot(dollJoint, shotDamage, direction.normalized * ShotForce, hit.point);
                 }
             }
         }

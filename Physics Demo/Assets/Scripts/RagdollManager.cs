@@ -5,11 +5,11 @@ using UnityEngine;
 public class RagdollManager : MonoBehaviour {
 
     public GameObject Root;
-    public List<Rigidbody> RagdollBodies;
+    public List<RagdollJoint> DollJoints;
 
     private void Awake()
     {
-        RagdollBodies = new List<Rigidbody>(Root.GetComponentsInChildren<Rigidbody>());
+        DollJoints = new List<RagdollJoint>(Root.GetComponentsInChildren<RagdollJoint>());
     }
 
 	// Use this for initialization
@@ -23,15 +23,9 @@ public class RagdollManager : MonoBehaviour {
 
     public void setRagdollActive(bool value)
     {
-        foreach(Rigidbody body in RagdollBodies)
+        foreach(RagdollJoint joint in DollJoints)
         {
-            body.isKinematic = !value;
-            // HACK maybe also turn colliders on and off?
-            Collider c = body.GetComponent<Collider>();
-            if (c != null)
-            {
-                c.enabled = value;
-            }
+            joint.SetRagdollActive(value);
         }
     }
 }
