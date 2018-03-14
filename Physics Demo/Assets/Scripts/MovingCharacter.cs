@@ -49,6 +49,8 @@ public class MovingCharacter : MonoBehaviour {
 
     int framesStationary = 0;
 
+    SlidingWall platform;
+
 	void Awake() {
 	}
 
@@ -93,8 +95,13 @@ public class MovingCharacter : MonoBehaviour {
         // TODO if ground normal not too steep (count as (0,1,0) in air), project move onto ground and set velocity to move along it
         Vector3 groundVelocity = Vector3.ProjectOnPlane(velocity, m_groundNormal);
         bool stopping = false;
+        Vector3 platformVelocity = Vector3.zero;
+        if(platform != null)
+        {
+            platformVelocity = platform.GetComponent<Rigidbody>().velocity;
+        }
 
-        Vector3 difference = groundVelocity - m_rigidbody.velocity;
+        Vector3 difference = groundVelocity - Vector3.ProjectOnPlane(m_rigidbody.velocity - platformVelocity, m_groundNormal);
 
         float acceleration;
         if (m_grounded)
@@ -237,18 +244,25 @@ public class MovingCharacter : MonoBehaviour {
     
     void checkGround()
     {
+        platform = null;        // Reset having platform under player
+
         if (m_grounded || m_rigidbody.velocity.y <= 0)      // If not grounded and moving up, won't ground
         {
             // checkGround to get grounded and ground normal
             RaycastHit groundTest;
             // TODO figure out layermask, whether querytriggerinteraction needs setting
             m_grounded = Physics.Raycast(transform.position + Vector3.up * GROUND_CHECK_OFFSET, Vector3.down, out groundTest, GROUND_CHECK_DISTANCE);
-            // TODO check if standing on moving platform, if so treat as 
             Debug.DrawRay(transform.position + Vector3.up * GROUND_CHECK_OFFSET, Vector3.down, Color.red);
             Vector3 hitNormal = groundTest.normal;
             if (m_grounded)
             {
                 m_groundNormal = groundTest.normal;
+                // TODO check if standing on moving platform, if so treat as 
+                platform = groundTest.collider.GetComponent<SlidingWall>();
+                if(platform != null)
+                {
+                    UnfreezeMovement();
+                }
             }
             else
             {
