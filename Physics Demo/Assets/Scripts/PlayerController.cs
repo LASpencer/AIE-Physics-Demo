@@ -22,6 +22,7 @@ public class PlayerController : MonoBehaviour {
     [SerializeField]
     Transform ShotOrigin;
     public GameObject ShotLine;
+    public GameObject SmokeEffect;
     public float LaserEffectTime;
     public int Damage;
     public int HeadshotDamage;
@@ -72,36 +73,48 @@ public class PlayerController : MonoBehaviour {
             Ray clickRay = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
 
+
             // TODO figure out layers, mask
             if(Physics.Raycast(clickRay, out hit, float.PositiveInfinity, ShootMask, QueryTriggerInteraction.Collide))
             {
-                // TODO second raycast from head to clicked position to check laser can hit
-
-                // draw beam being shot
-                GameObject laser = Instantiate(ShotLine);
-                LineRenderer laserLine = laser.GetComponent<LineRenderer>();
-                laserLine.SetPosition(0, ShotOrigin.position);
-                laserLine.SetPosition(1, hit.point);
-                Destroy(laser, LaserEffectTime);
-
-                //TODO use tags, etc to make decision
-                RagdollJoint dollJoint = hit.collider.GetComponent<RagdollJoint>();
-                EnemyController enemy = hit.collider.GetComponentInParent<EnemyController>();
-                if(enemy != null && dollJoint != null)
+                // second raycast from head to clicked position to check laser can hit
+                Ray shotRay = new Ray(ShotOrigin.position, hit.point - ShotOrigin.position);
+                if (Physics.Raycast(shotRay, out hit, ShotRange, ShootMask, QueryTriggerInteraction.Collide))
                 {
-                    int shotDamage = Damage;
-                    if(dollJoint.Part == RagdollPart.Head)
+
+                    // draw beam being shot
+                    GameObject laser = Instantiate(ShotLine);
+                    LineRenderer laserLine = laser.GetComponent<LineRenderer>();
+                    laserLine.SetPosition(0, ShotOrigin.position);
+                    laserLine.SetPosition(1, hit.point);
+                    Destroy(laser, LaserEffectTime);
+
+                    //TODO use tags, etc to make decision
+                    RagdollJoint dollJoint = hit.collider.GetComponent<RagdollJoint>();
+                    EnemyController enemy = hit.collider.GetComponentInParent<EnemyController>();
+                    if (enemy != null && dollJoint != null)
                     {
-                        shotDamage = HeadshotDamage;
-                        Debug.Log("Headshot on enemy");
-                    } else
-                    {
-                        Debug.Log("Shot enemy");
-                    }
-                    // TODO check is 
-                    Vector3 direction = hit.point - ShotOrigin.position;
+                        int shotDamage = Damage;
+                        if (dollJoint.Part == RagdollPart.Head)
+                        {
+                            shotDamage = HeadshotDamage;
+                            Debug.Log("Headshot on enemy");
+                        }
+                        else
+                        {
+                            Debug.Log("Shot enemy");
+                        }
+                        // TODO check is 
+                        Vector3 direction = hit.point - ShotOrigin.position;
+
+                        enemy.Shoot(dollJoint, shotDamage, direction.normalized * ShotForce, hit.point);
+                    } 
+                    // If nothing hit, just put smoke effect
+                    GameObject smoke = Instantiate(SmokeEffect);
+                    smoke.transform.position = hit.point;
+                    smoke.transform.eulerAngles = new Vector3(-90, 0, 0);
+                    Destroy(smoke, 5);
                     
-                    enemy.Shoot(dollJoint, shotDamage, direction.normalized * ShotForce, hit.point);
                 }
             }
         }

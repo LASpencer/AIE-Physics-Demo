@@ -836,6 +836,48 @@ Transform:
   m_Father: {fileID: 2122752531}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &445728249
+Prefab:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 4258092555639342, guid: c38a72ebf1fd2384fa8ffcac5ef14216, type: 2}
+      propertyPath: m_LocalPosition.x
+      value: 7.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4258092555639342, guid: c38a72ebf1fd2384fa8ffcac5ef14216, type: 2}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4258092555639342, guid: c38a72ebf1fd2384fa8ffcac5ef14216, type: 2}
+      propertyPath: m_LocalPosition.z
+      value: -7.14
+      objectReference: {fileID: 0}
+    - target: {fileID: 4258092555639342, guid: c38a72ebf1fd2384fa8ffcac5ef14216, type: 2}
+      propertyPath: m_LocalRotation.x
+      value: -0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 4258092555639342, guid: c38a72ebf1fd2384fa8ffcac5ef14216, type: 2}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4258092555639342, guid: c38a72ebf1fd2384fa8ffcac5ef14216, type: 2}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4258092555639342, guid: c38a72ebf1fd2384fa8ffcac5ef14216, type: 2}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 4258092555639342, guid: c38a72ebf1fd2384fa8ffcac5ef14216, type: 2}
+      propertyPath: m_RootOrder
+      value: 22
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 100100000, guid: c38a72ebf1fd2384fa8ffcac5ef14216, type: 2}
+  m_IsPrefabParent: 0
 --- !u!1 &452419745
 GameObject:
   m_ObjectHideFlags: 0
@@ -1075,6 +1117,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e4f8aaba12365246b96e8939976586f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  targets:
+  - position: {x: -8, y: 0, z: 0}
+    duration: 2
+  - position: {x: 0, y: 0, z: 0}
+    duration: 2
+  targetIndex: 0
 --- !u!1 &533439821
 GameObject:
   m_ObjectHideFlags: 0
@@ -2801,10 +2849,12 @@ MonoBehaviour:
     m_Bits: 513
   ShotOrigin: {fileID: 1787972919}
   ShotLine: {fileID: 1479348686839574, guid: 7f088b747f7eefd4b9187ead1c67aa4c, type: 2}
+  SmokeEffect: {fileID: 1807283320825238, guid: c38a72ebf1fd2384fa8ffcac5ef14216,
+    type: 2}
   LaserEffectTime: 0.1
   Damage: 1
   HeadshotDamage: 2
-  ShotRange: 20
+  ShotRange: 50
   ShotForce: 5
 --- !u!114 &1258082416
 MonoBehaviour:

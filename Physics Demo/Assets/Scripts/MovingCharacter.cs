@@ -23,6 +23,9 @@ public class MovingCharacter : MonoBehaviour {
     bool m_crouched;
     public bool Crouched { get { return m_crouched; } }
 
+    [SerializeField]
+    LayerMask crouchCheckMask;
+
     [Header("Movement")]
     public float GroundForce;
     public float AirForce;
@@ -215,14 +218,20 @@ public class MovingCharacter : MonoBehaviour {
             return true;
         } else
         {
-            // TODO on uncrouching, check enough headroom. If not, stay crouched and return false
-            // Use a spherecast matching the standing capsule to check going to stand won't collide
-            UnfreezeMovement();
-            m_crouched = false;
-            m_collider.height = m_capsuleHeight;
-            m_collider.radius = m_capsuleRadius;
-            m_collider.center = m_capsuleCenter;
-            return true;
+            if (!Physics.SphereCast(new Ray(transform.position, Vector3.up), m_capsuleRadius, m_capsuleHeight - m_capsuleRadius, crouchCheckMask))
+            {
+                // TODO on uncrouching, check enough headroom. If not, stay crouched and return false
+                // Use a spherecast matching the standing capsule to check going to stand won't collide
+                UnfreezeMovement();
+                m_crouched = false;
+                m_collider.height = m_capsuleHeight;
+                m_collider.radius = m_capsuleRadius;
+                m_collider.center = m_capsuleCenter;
+                return true;
+            } else
+            {
+                return false;
+            }
         }
     }
     
@@ -234,6 +243,7 @@ public class MovingCharacter : MonoBehaviour {
             RaycastHit groundTest;
             // TODO figure out layermask, whether querytriggerinteraction needs setting
             m_grounded = Physics.Raycast(transform.position + Vector3.up * GROUND_CHECK_OFFSET, Vector3.down, out groundTest, GROUND_CHECK_DISTANCE);
+            // TODO check if standing on moving platform, if so treat as 
             Debug.DrawRay(transform.position + Vector3.up * GROUND_CHECK_OFFSET, Vector3.down, Color.red);
             Vector3 hitNormal = groundTest.normal;
             if (m_grounded)
