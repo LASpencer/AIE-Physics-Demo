@@ -48,6 +48,7 @@ public class EnemyController : MonoBehaviour {
             m_movingCharacter.enabled = false;
             m_movingCharacter.rigidbody.isKinematic = true;
             //TODO disable animator, rigidbody, etc
+            animator.enabled = false;
             ragdoll.setRagdollActive(true);
             Debug.Log(string.Format("Killed, force of {0} applied at {1}", impactForce, point));
             joint.Body.AddForceAtPosition(impactForce, point, ForceMode.Impulse);
