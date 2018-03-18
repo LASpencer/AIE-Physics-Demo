@@ -3093,9 +3093,9 @@ MonoBehaviour:
   crouchCheckMask:
     serializedVersion: 2
     m_Bits: 512
-  GroundForce: 5
+  GroundForce: 10
   AirForce: 3
-  BrakingForce: 2
+  BrakingForce: 5
   JumpVelocity: 10
   RotationSpeed: 360
   m_crouchCapsuleRadius: 0.4
@@ -3199,7 +3199,7 @@ ConfigurableJoint:
   m_ConnectedAnchor: {x: 14.31, y: 4.79, z: 7.29}
   serializedVersion: 2
   m_SecondaryAxis: {x: 0, y: 1, z: 0}
-  m_XMotion: 2
+  m_XMotion: 0
   m_YMotion: 0
   m_ZMotion: 2
   m_AngularXMotion: 0
