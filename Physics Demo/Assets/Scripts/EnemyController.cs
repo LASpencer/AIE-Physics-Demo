@@ -35,7 +35,7 @@ public class EnemyController : MonoBehaviour {
 
     public void Shoot(RagdollJoint joint, int damage, Vector3 impactForce, Vector3 point)
     {
-        // TODO particle effect where hit
+        // Particle effect where hit
         Quaternion particleRotation = Quaternion.LookRotation(impactForce, Vector3.up);
         GameObject particles = Instantiate(HitParticles, point, particleRotation);
         Destroy(particles, HitParticleTime);

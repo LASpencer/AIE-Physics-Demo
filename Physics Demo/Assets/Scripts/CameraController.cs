@@ -8,16 +8,20 @@ public class CameraController : MonoBehaviour {
 
     Camera camera;
 
+    [Tooltip("Distance from camera to target")]
     public float distance;
+    [Tooltip("Point relative to player position camera looks at")]
     public Vector3 offset;
+    [Tooltip("Degrees per second camera pans left and right")]
     public float panRate;
-    [Tooltip("As proportion of screen width")]
+    [Tooltip("Proportion of screen width where mouse makes camera pan")]
     public float panMargin;
 
+    [Tooltip("Degrees per second camera tilts up and down")]
     public float tiltRate;
     public float minTilt;
     public float maxTilt;
-    [Tooltip("As proportion of screen height")]
+    [Tooltip("Proportion of screen height where mouse makes camera tilt")]
     public float tiltMargin;
 
 	// Use this for initialization
@@ -33,7 +37,6 @@ public class CameraController : MonoBehaviour {
     private void LateUpdate()
     {
         Vector3 mousePosition = camera.ScreenToViewportPoint(Input.mousePosition);
-        // TODO maybe check mouse inside screen?
         Vector3 newOrientation = transform.eulerAngles;
         if(newOrientation.x > 180)
         {
@@ -41,7 +44,7 @@ public class CameraController : MonoBehaviour {
             newOrientation.x -= 360;
         }
 
-        if (mousePosition.x >= 0 && mousePosition.x <= 1)
+        if (mousePosition.x >= 0 && mousePosition.x <= 1 && mousePosition.y >= 0 && mousePosition.y <= 1)
         {
             if (mousePosition.x < panMargin)
             {
@@ -54,10 +57,7 @@ public class CameraController : MonoBehaviour {
                 // Rotate right
                 newOrientation += Vector3.up * panRate * Time.deltaTime;
             }
-        }
 
-        if (mousePosition.y >= 0 && mousePosition.y <= 1)
-        {
             if (mousePosition.y < tiltMargin)
             {
                 // Tilt up
@@ -70,10 +70,9 @@ public class CameraController : MonoBehaviour {
                 newOrientation -= Vector3.right * tiltRate * Time.deltaTime;
             }
         }
+
         newOrientation.x = Mathf.Clamp(newOrientation.x, minTilt, maxTilt);
         transform.eulerAngles = newOrientation;
-
-        
 
         transform.position = Player.transform.position + offset - transform.forward * distance;
     }
