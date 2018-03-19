@@ -44,10 +44,10 @@ public class EnemyController : MonoBehaviour {
         Debug.Log(string.Format("Shot for {0} damage", damage));
         if(Health == 0)
         {
+            // Ragdoll on death
             col.enabled = false;
             m_movingCharacter.enabled = false;
             m_movingCharacter.rigidbody.isKinematic = true;
-            //TODO disable animator, rigidbody, etc
             animator.enabled = false;
             ragdoll.setRagdollActive(true);
             Debug.Log(string.Format("Killed, force of {0} applied at {1}", impactForce, point));

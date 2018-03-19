@@ -12,7 +12,6 @@ public class PlayerController : MonoBehaviour {
     public CameraController cam;
 
     public float Speed;
-    //TODO crouching move speed
     Vector3 m_movementInput;
     bool m_jump;
 
@@ -45,27 +44,18 @@ public class PlayerController : MonoBehaviour {
 
         m_movementInput = cameraForward * Input.GetAxis("Vertical") + cameraRight * Input.GetAxis("Horizontal");
         m_movementInput *= Speed;
-
-        // HACK maybe move out to fixed update
-        //m_movingCharacter.SetGroundVelocity(m_movementInput);
-
-        // HACK get actual speed, not desired
-        //m_animator.SetFloat("Speed", m_movementInput.magnitude);
+        
 
         if (Input.GetButtonDown("Jump"))
         {
             m_jump = true;
-            //if (m_movingCharacter.Jump())
-            //{
-            //    m_animator.SetTrigger("Jumped");
-            //}
         }
 
         if (Input.GetButtonDown("Crouch"))
         {
             m_movingCharacter.SetCrouching(!m_movingCharacter.Crouched);
             m_animator.SetBool("Crouching", m_movingCharacter.Crouched);
-            // TODO can't crouch in jump, on ungrounding, uncrouch
+            // Maybe can't be crouched in jump?
         }
 
         if (Input.GetButtonDown("Fire1"))
@@ -73,8 +63,7 @@ public class PlayerController : MonoBehaviour {
             Ray clickRay = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
 
-
-            // TODO figure out layers, mask
+            
             if(Physics.Raycast(clickRay, out hit, float.PositiveInfinity, ShootMask, QueryTriggerInteraction.Collide))
             {
                 // second raycast from head to clicked position to check laser can hit
@@ -88,12 +77,13 @@ public class PlayerController : MonoBehaviour {
                     laserLine.SetPosition(0, ShotOrigin.position);
                     laserLine.SetPosition(1, hit.point);
                     Destroy(laser, LaserEffectTime);
+                    
 
-                    //TODO use tags, etc to make decision
                     RagdollJoint dollJoint = hit.collider.GetComponent<RagdollJoint>();
                     EnemyController enemy = hit.collider.GetComponentInParent<EnemyController>();
                     if (enemy != null && dollJoint != null)
                     {
+                        // If hit an enemy, damage them
                         int shotDamage = Damage;
                         if (dollJoint.Part == RagdollPart.Head)
                         {
@@ -104,7 +94,6 @@ public class PlayerController : MonoBehaviour {
                         {
                             Debug.Log("Shot enemy");
                         }
-                        // TODO check is 
                         Vector3 direction = hit.point - ShotOrigin.position;
 
                         enemy.Shoot(dollJoint, shotDamage, direction.normalized * ShotForce, hit.point);
@@ -125,9 +114,8 @@ public class PlayerController : MonoBehaviour {
         m_animator.SetBool("Grounded", m_movingCharacter.IsGrounded);
 
         m_movingCharacter.SetGroundVelocity(m_movementInput);
-
-        // HACK get actual speed, not desired
-        m_animator.SetFloat("Speed", m_movingCharacter.rigidbody.velocity.magnitude);
+        
+        m_animator.SetFloat("Speed", m_movingCharacter.RelativeVelocity.magnitude);
 
         if (m_jump)
         {

@@ -51,13 +51,24 @@ public class MovingCharacter : MonoBehaviour {
 
     SlidingWall platform;
 
+    // Velocity relative to platform (if on one)
+    public Vector3 RelativeVelocity
+    {
+        get {
+            Vector3 relativeVelocity = m_rigidbody.velocity;
+            if(platform != null)
+            {
+                relativeVelocity -= platform.GetComponent<Rigidbody>().velocity;
+            }
+            return relativeVelocity;
+        }
+    }
+
 	void Awake() {
 	}
 
 	// Use this for initialization
 	void Start () {
-        // HACK figure out if this is correct/matters
-        // Doing this so user could add multiple capsule colliders and set one, but if not just pick one
 		if(m_collider == null)
         {
             m_collider = gameObject.GetComponent<CapsuleCollider>();
@@ -106,13 +117,13 @@ public class MovingCharacter : MonoBehaviour {
         float acceleration;
         if (m_grounded)
         {
-            float frictionRatio = 0.0f;  // How much braking force to apply
+            float frictionRatio = 0.0f;  // How much braking force to apply, to make stopping and turning around easier
             if (groundVelocity == Vector3.zero)
             {
                 // Coming to a stop
                 frictionRatio = 1.0f;
                 stopping = true;
-                // Force stop if moving slowly
+                // Force stop if moving slowly for enough frames to avoid sliding down slopes
                 if (m_rigidbody.velocity.sqrMagnitude < MIN_GROUND_SPEED * MIN_GROUND_SPEED)
                 {
                     if (framesStationary >= FRAMES_UNTIL_FREEZE)
@@ -152,32 +163,24 @@ public class MovingCharacter : MonoBehaviour {
         Vector3 deltaV = Vector3.ClampMagnitude(difference, acceleration * Time.fixedDeltaTime);
 
         m_rigidbody.AddForce(deltaV, ForceMode.VelocityChange);
-
-        // TODO turn rigidbody towards desired direction
+        
+        // Turn in direction of movement
 
         if (!stopping) {
             RotateTowards(m_rigidbody.velocity);
         }
-        // Maybe if facing and desired velocity too far apart, move less while turning?
-
-
-
     }
 
     public void SetVelocity(Vector3 velocity)
     {
-        // TODO set velocity to move given displacement (including y movement)
-        // TODO turn rigidbody to face movement direction
+
         RotateTowards(velocity);
-
-
         m_rigidbody.velocity = velocity;
     }
-
-    // TODO rotate without moving
+    
+    // Turn towards given direction
     public void RotateTowards(Vector3 forward)
     {
-        // TODO rotate front towards given direction
         forward.y = 0;
         if (forward != Vector3.zero)
         {
@@ -185,17 +188,12 @@ public class MovingCharacter : MonoBehaviour {
             transform.rotation = Quaternion.RotateTowards(transform.rotation, desiredDirection, RotationSpeed * Time.fixedDeltaTime);
         }
     }
-
-    // TODO jump command
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <returns>Returns true if character could jump</returns>
+    
+    // Returns true if character can jump
     public bool Jump()
     {
         if (m_grounded)
         {
-            // HACK try both adding and setting Y
             UnfreezeMovement();
             m_rigidbody.velocity = new Vector3(m_rigidbody.velocity.x, JumpVelocity, m_rigidbody.velocity.z);
             m_grounded = false;
@@ -206,8 +204,7 @@ public class MovingCharacter : MonoBehaviour {
             return false;
         }
     }
-
-    // TODO crouch/uncrouch function
+    
     // Uncrouch needs to check nothing too high above
     public bool SetCrouching(bool crouch)
     {
@@ -227,7 +224,6 @@ public class MovingCharacter : MonoBehaviour {
         {
             if (!Physics.SphereCast(new Ray(transform.position, Vector3.up), m_capsuleRadius, m_capsuleHeight - m_capsuleRadius, crouchCheckMask))
             {
-                // TODO on uncrouching, check enough headroom. If not, stay crouched and return false
                 // Use a spherecast matching the standing capsule to check going to stand won't collide
                 UnfreezeMovement();
                 m_crouched = false;
@@ -244,20 +240,19 @@ public class MovingCharacter : MonoBehaviour {
     
     void checkGround()
     {
-        platform = null;        // Reset having platform under player
+        platform = null;
 
         if (m_grounded || m_rigidbody.velocity.y <= 0)      // If not grounded and moving up, won't ground
         {
             // checkGround to get grounded and ground normal
             RaycastHit groundTest;
-            // TODO figure out layermask, whether querytriggerinteraction needs setting
             m_grounded = Physics.Raycast(transform.position + Vector3.up * GROUND_CHECK_OFFSET, Vector3.down, out groundTest, GROUND_CHECK_DISTANCE);
             Debug.DrawRay(transform.position + Vector3.up * GROUND_CHECK_OFFSET, Vector3.down, Color.red);
             Vector3 hitNormal = groundTest.normal;
             if (m_grounded)
             {
                 m_groundNormal = groundTest.normal;
-                // TODO check if standing on moving platform, if so treat as 
+                // Check if on moving platform
                 platform = groundTest.collider.GetComponent<SlidingWall>();
                 if(platform != null)
                 {
@@ -273,8 +268,6 @@ public class MovingCharacter : MonoBehaviour {
         {
             m_groundNormal = Vector3.up;
         }
-
-        //TODO more robust check (multiple rays, boxcast)
     }
 
     [ExecuteInEditMode]

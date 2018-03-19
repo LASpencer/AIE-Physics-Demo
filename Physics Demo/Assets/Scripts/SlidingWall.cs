@@ -28,7 +28,6 @@ public class SlidingWall : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        // TODO change target position x between 0 and -8
         elapsedTime += Time.deltaTime;
         while(elapsedTime >= targets[targetIndex].duration)
         {
