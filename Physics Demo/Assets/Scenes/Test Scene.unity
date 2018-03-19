@@ -12428,12 +12428,6 @@ GameObject:
   - component: {fileID: 2004384410}
   - component: {fileID: 2004384408}
   - component: {fileID: 2004384407}
-  - component: {fileID: 2004384388}
-  - component: {fileID: 2004384387}
-  - component: {fileID: 2004384386}
-  - component: {fileID: 2004384385}
-  - component: {fileID: 2004384384}
-  - component: {fileID: 2004384383}
   - component: {fileID: 2004384382}
   - component: {fileID: 2004384381}
   - component: {fileID: 2004384380}
@@ -12489,6 +12483,11 @@ GameObject:
   - component: {fileID: 2004384395}
   - component: {fileID: 2004384394}
   - component: {fileID: 2004384391}
+  - component: {fileID: 2004384388}
+  - component: {fileID: 2004384386}
+  - component: {fileID: 2004384385}
+  - component: {fileID: 2004384384}
+  - component: {fileID: 2004384383}
   m_Layer: 8
   m_Name: Cape
   m_TagString: Untagged
@@ -13098,20 +13097,6 @@ MeshCollider:
   m_CookingOptions: 14
   m_SkinWidth: 0.01
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
---- !u!64 &2004384387
-MeshCollider:
-  m_ObjectHideFlags: 3
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 2004384343}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Convex: 0
-  m_CookingOptions: 14
-  m_SkinWidth: 0.01
-  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!64 &2004384388
 MeshCollider:
   m_ObjectHideFlags: 3
@@ -13276,12 +13261,12 @@ Cloth:
   m_Enabled: 1
   m_StretchingStiffness: 1
   m_BendingStiffness: 0.2
-  m_UseTethers: 1
+  m_UseTethers: 0
   m_UseGravity: 1
-  m_Damping: 0.1
+  m_Damping: 0.5
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
-  m_RandomAcceleration: {x: 0.2, y: 0, z: 0.2}
-  m_WorldVelocityScale: 0.5
+  m_RandomAcceleration: {x: 0.1, y: 0, z: 0.1}
+  m_WorldVelocityScale: 1
   m_WorldAccelerationScale: 1
   m_Friction: 0.5
   m_CollisionMassScale: 0

@@ -107,6 +107,11 @@ public class PlayerController : MonoBehaviour {
                 }
             }
         }
+
+        // Quit game on esc
+        if (Input.GetButtonDown("Cancel")){
+            Application.Quit();
+        }
     }
 
     private void FixedUpdate()

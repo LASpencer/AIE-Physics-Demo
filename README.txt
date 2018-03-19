@@ -4,6 +4,8 @@ By Andrew Spencer 2018
 
 This project demonstrates the use of physics systems in Unity.
 
+A git repository for the project can be found at https://github.com/LASpencer/AIE-Physics-Demo
+
 ====USE====
 
 In this game the player controls a robot who can shoot at skeletons with a laser.
@@ -12,6 +14,7 @@ Use wasd or direction keys to move
 Click on a skeleton to fire a laser
 Left Control to Crouch
 Spacebar to Jump
+Esc to quit
 
 Moving the mouse near the edges of the screen to rotate the camera
 
